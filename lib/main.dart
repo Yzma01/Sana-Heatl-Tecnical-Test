@@ -4,7 +4,7 @@ import 'package:sana_health_t/blocs/product/bloc/product_bloc.dart';
 import 'package:sana_health_t/blocs/product/bloc/product_event.dart';
 import 'package:sana_health_t/blocs/product/repository/product_repository.dart';
 import 'package:sana_health_t/data/api/dummyjson.dart';
-import 'package:sana_health_t/ui/screens/home.dart';
+import 'package:sana_health_t/ui/screens/home_screen.dart';
 
 void main() {
   runApp(const MyApp());

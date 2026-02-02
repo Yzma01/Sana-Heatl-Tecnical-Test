@@ -12,17 +12,13 @@ class ProductRepository {
       final response = await api.fetchProducts();
 
       final productsData = response['products'] as List<dynamic>;
-      final List<Product> products = [];
-
-      productsData.forEach((productJson) {
-        debugPrint('Product JSON: $productJson');
-        final p = Product.fromJson(productJson);
-        debugPrint('Fetched product: ${p.title}');
-        products.add(p);
-      });
-
+      final p;
+      final products = productsData
+          .map((productJson) => Product.fromJson(productJson))
+          .toList();
       return products;
     } catch (e) {
+      debugPrint('Error fetching products: $e');
       rethrow;
     }
   }
