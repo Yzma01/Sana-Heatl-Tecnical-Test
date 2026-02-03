@@ -3,17 +3,22 @@ import 'package:flutter/rendering.dart';
 import 'package:sana_health_t/blocs/product/bloc/product_event.dart';
 import 'package:sana_health_t/blocs/product/bloc/product_state.dart';
 import 'package:sana_health_t/blocs/product/repository/product_repository.dart';
+import 'package:sana_health_t/data/models/categories.dart';
 import 'package:sana_health_t/data/models/product.dart';
 
 class ProductBloc extends Bloc<ProductEvent, ProductState> {
   final ProductRepository productRepository;
   List<int> deletedProducts = [];
   List<Product> localProducts = [];
+
   ProductBloc({required this.productRepository}) : super(ProductInitial()) {
     on<LoadProducts>(_onLoadProducts);
     on<SearchProducts>(_onSearchProducts);
     on<DeleteProduct>(_onDeleteProduct);
     on<AddProduct>(_onAddProduct);
+    on<UpdateProduct>(_onUpdateProduct);
+    on<ProductCategory>(_onProductCategory);
+    on<ProductsCategories>(_onProductsCategories);
   }
 
   void _onDeleteProduct(DeleteProduct event, Emitter<ProductState> emit) async {
@@ -73,6 +78,56 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       event.productData.id = currentState.products.length + 10;
       localProducts.add(event.productData);
       emit(ProductLoaded(filterProducts(currentState.products)));
+    } catch (e) {
+      emit(ProductError(e.toString()));
+    }
+  }
+
+  void _onUpdateProduct(UpdateProduct event, Emitter<ProductState> emit) async {
+    if (state is! ProductLoaded) return;
+
+    final currentState = state as ProductLoaded;
+
+    try {
+      emit(ProductLoading());
+      await productRepository.updateProduct(event.productId, event.updatedData);
+
+      final updatedProducts = currentState.products.map((product) {
+        if (product.id == event.productId) {
+          final data = event.updatedData;
+          data.id = event.productId;
+          return data;
+        }
+        return product;
+      }).toList();
+
+      emit(ProductLoaded(filterProducts(updatedProducts)));
+    } catch (e) {
+      emit(ProductError(e.toString()));
+    }
+  }
+
+  void _onProductsCategories(
+    ProductsCategories event,
+    Emitter<ProductState> emit,
+  ) async {
+    emit(ProductLoading());
+    try {
+      final categories = await productRepository.getCategories();
+      emit(ProductCategoryLoaded(categories: categories));
+    } catch (e) {
+      emit(ProductError(e.toString()));
+    }
+  }
+
+  void _onProductCategory(
+    ProductCategory event,
+    Emitter<ProductState> emit,
+  ) async {
+    emit(ProductLoading());
+    try {
+      final products = await productRepository.getCategory(event.url);
+      emit(ProductLoaded(filterProducts(products)));
     } catch (e) {
       emit(ProductError(e.toString()));
     }

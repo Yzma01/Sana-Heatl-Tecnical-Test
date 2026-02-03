@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:sana_health_t/blocs/product/bloc/product_bloc.dart';
 import 'package:sana_health_t/blocs/product/bloc/product_event.dart';
+import 'package:sana_health_t/providers/form.dart';
+import 'package:sana_health_t/providers/searchbar.dart';
 import 'package:sana_health_t/ui/screens/add_product_screen.dart';
+import 'package:sana_health_t/ui/screens/categories_screen.dart';
 import 'package:sana_health_t/ui/widgets/general/icon_button.dart';
 
 class SearchBarWidget extends StatefulWidget {
@@ -14,34 +16,47 @@ class SearchBarWidget extends StatefulWidget {
 }
 
 class _SearchBarState extends State<SearchBarWidget> {
-  final TextEditingController _textInputControl = TextEditingController();
-
-  void _searchByCategories() {}
+  SearchProvider? searchProvider;
+  void _searchByCategories() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => CategoriesScreen()),
+    );
+  }
 
   void _searchProduct() {
-    if (_textInputControl.text.isEmpty) {
+    if (searchProvider!.controller.text.isEmpty) {
       return;
     }
-    context.read<ProductBloc>().add(SearchProducts(_textInputControl.text));
+    FocusScope.of(context).unfocus();
+    context.read<ProductBloc>().add(
+      SearchProducts(searchProvider!.controller.text),
+    );
   }
 
   void _addProduct() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => AddProductScreen()),
+      MaterialPageRoute(
+        builder: (context) => ChangeNotifierProvider(
+          create: (_) => FormProvider(),
+          child: AddProductScreen(),
+        ),
+      ),
     );
   }
 
   void _deleteSearch() {
-    if (_textInputControl.text.isEmpty) {
+    if (searchProvider!.controller.text.isEmpty) {
       return;
     }
-    _textInputControl.text = '';
+    searchProvider!.controller.text = '';
     context.read<ProductBloc>().add(LoadProducts());
   }
 
   @override
   Widget build(BuildContext context) {
+    searchProvider = context.watch<SearchProvider>();
     return Center(
       child: SafeArea(
         child: Padding(
@@ -51,7 +66,7 @@ class _SearchBarState extends State<SearchBarWidget> {
             children: [
               Expanded(
                 child: TextField(
-                  controller: _textInputControl,
+                  controller: searchProvider!.controller,
                   style: const TextStyle(fontSize: 16, color: Colors.black),
                   decoration: InputDecoration(
                     hintText: 'Search product...',

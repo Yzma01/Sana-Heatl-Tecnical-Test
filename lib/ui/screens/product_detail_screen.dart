@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sana_health_t/blocs/product/bloc/product_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:sana_health_t/blocs/product/bloc/product_event.dart';
 import 'package:sana_health_t/data/models/product.dart';
-import 'package:sana_health_t/ui/screens/edit_product_screen.dart';
-import 'package:sana_health_t/ui/screens/home_screen.dart';
+import 'package:sana_health_t/providers/form.dart';
+import 'package:sana_health_t/ui/screens/add_product_screen.dart';
 import 'package:sana_health_t/ui/widgets/general/icon_button.dart';
 import 'package:sana_health_t/ui/widgets/general/section_title.dart';
 import 'package:sana_health_t/ui/widgets/product_detail/images_carousel.dart';
@@ -26,7 +27,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditProductScreen(product: widget.product),
+        builder: (context) => ChangeNotifierProvider(
+          create: (_) => FormProvider(),
+          child: AddProductScreen(product: widget.product),
+        ),
       ),
     );
   }
@@ -47,7 +51,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
-              context.read<ProductBloc>().add(DeleteProduct(widget.product.id));
+              context.read<ProductBloc>().add(
+                DeleteProduct(widget.product.id!),
+              );
               Navigator.pop(context);
               Navigator.pop(context);
             },

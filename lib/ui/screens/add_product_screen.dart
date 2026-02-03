@@ -2,17 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sana_health_t/blocs/product/bloc/product_bloc.dart';
 import 'package:sana_health_t/blocs/product/bloc/product_event.dart';
+import 'package:sana_health_t/data/models/product.dart';
 import 'package:sana_health_t/providers/form.dart';
-import 'package:sana_health_t/ui/widgets/form/sections.dart/%20%20dimensions_section.dart';
-import 'package:sana_health_t/ui/widgets/form/sections.dart/%20additional_info_section.dart';
-import 'package:sana_health_t/ui/widgets/form/sections.dart/%20basic_data_section.dart';
-import 'package:sana_health_t/ui/widgets/form/sections.dart/%20inventory_section.dart';
-import 'package:sana_health_t/ui/widgets/form/sections.dart/image_picker_section.dart';
-import 'package:sana_health_t/ui/widgets/form/sections.dart/pricing_section.dart';
+import 'package:sana_health_t/ui/widgets/form/sections/%20%20dimensions_section.dart';
+import 'package:sana_health_t/ui/widgets/form/sections/%20additional_info_section.dart';
+import 'package:sana_health_t/ui/widgets/form/sections/%20basic_data_section.dart';
+import 'package:sana_health_t/ui/widgets/form/sections/%20inventory_section.dart';
+import 'package:sana_health_t/ui/widgets/form/sections/image/image_picker_section.dart';
+import 'package:sana_health_t/ui/widgets/form/sections/pricing_section.dart';
 import 'package:sana_health_t/ui/widgets/general/section_title.dart';
 
 class AddProductScreen extends StatefulWidget {
-  const AddProductScreen({super.key});
+  Product? product;
+  AddProductScreen({super.key, this.product});
 
   @override
   State<AddProductScreen> createState() => _AddProductScreenState();
@@ -21,11 +23,23 @@ class AddProductScreen extends StatefulWidget {
 class _AddProductScreenState extends State<AddProductScreen> {
   final _formKey = GlobalKey<FormState>();
   late FormProvider form;
+  bool isEdit = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     form = context.read<FormProvider>();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.product != null && !widget.product!.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        form.loadProduct(widget.product!);
+      });
+      isEdit = true;
+    }
   }
 
   void _submitForm() {
@@ -38,10 +52,21 @@ class _AddProductScreenState extends State<AddProductScreen> {
       }
 
       final productData = form.product;
-      context.read<ProductBloc>().add(AddProduct(productData));
+      if (isEdit) {
+        context.read<ProductBloc>().add(
+          UpdateProduct(widget.product!.id!, productData),
+        );
+      } else {
+        context.read<ProductBloc>().add(AddProduct(productData));
+      }
       form.clearForm();
       form.clearImages();
       Navigator.pop(context);
+      if (isEdit) Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all the data mark on red')),
+      );
     }
   }
 

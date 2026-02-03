@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:sana_health_t/data/api/dummyjson.dart';
+import 'package:sana_health_t/data/models/categories.dart';
 import 'package:sana_health_t/data/models/product.dart';
 
 class ProductRepository {
@@ -46,6 +45,37 @@ class ProductRepository {
   Future<void> addProduct(Product product) async {
     try {
       await api.addProduct(product);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> updateProduct(int id, Product product) async {
+    try {
+      await api.updateProduct(id, product);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<Categories>> getCategories() async {
+    try {
+      final response = await api.getCategories();
+
+      final categories = (response)
+          .map((json) => Categories.fromJson(json))
+          .toList();
+
+      return categories;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<Product>> getCategory(String url) async {
+    try {
+      final response = await api.getCategory(url);
+      return parseResponse(response);
     } catch (e) {
       rethrow;
     }

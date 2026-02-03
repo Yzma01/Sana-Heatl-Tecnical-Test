@@ -24,7 +24,7 @@ class SelectorInput<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<T>(
-      value: value,
+      initialValue: value,
       items: items,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       onChanged: onChanged,

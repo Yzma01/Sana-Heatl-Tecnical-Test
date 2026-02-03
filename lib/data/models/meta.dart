@@ -37,4 +37,6 @@ class Meta {
       'qrCode': qrCode,
     };
   }
+
+  bool get isEmpty => barcode.isEmpty || qrCode.isEmpty;
 }

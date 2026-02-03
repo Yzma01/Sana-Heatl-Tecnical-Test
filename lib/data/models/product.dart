@@ -1,10 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'package:sana_health_t/data/models/dimentions.dart';
 import 'package:sana_health_t/data/models/meta.dart';
 import 'package:sana_health_t/data/models/review.dart';
 
 class Product {
-  int id;
+  int? id;
   String title;
   String description;
   String category;
@@ -142,5 +141,29 @@ Product(
   thumbnail: $thumbnail,
 )
 ''';
+  }
+
+  bool get isEmpty {
+    return title.isEmpty &&
+        description.isEmpty &&
+        category.isEmpty &&
+        price == 0 &&
+        discountPercentage == 0 &&
+        rating == 0 &&
+        stock == 0 &&
+        tags.isEmpty &&
+        brand.isEmpty &&
+        sku.isEmpty &&
+        weight == 0 &&
+        dimensions.isEmpty &&
+        warrantyInformation.isEmpty &&
+        shippingInformation.isEmpty &&
+        availabilityStatus.isEmpty &&
+        reviews.isEmpty &&
+        returnPolicy.isEmpty &&
+        minimumOrderQuantity == 0 &&
+        meta.isEmpty &&
+        images.isEmpty &&
+        thumbnail.isEmpty;
   }
 }

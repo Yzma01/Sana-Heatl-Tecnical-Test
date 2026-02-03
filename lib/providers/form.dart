@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:sana_health_t/data/models/image.dart';
 import 'package:sana_health_t/data/models/product.dart';
 import 'package:sana_health_t/data/models/dimentions.dart';
 import 'package:sana_health_t/data/models/meta.dart';
@@ -25,7 +26,7 @@ class FormProvider extends ChangeNotifier {
   final TextEditingController _heightController = TextEditingController();
   final TextEditingController _depthController = TextEditingController();
 
-  // Aditional information controllers
+  // Additional information controllers
   final TextEditingController _warrantyController = TextEditingController();
   final TextEditingController _shippingController = TextEditingController();
   final TextEditingController _returnPolicyController = TextEditingController();
@@ -34,7 +35,7 @@ class FormProvider extends ChangeNotifier {
 
   // Image picker
   final ImagePicker _picker = ImagePicker();
-  List<XFile> _selectedImages = [];
+  List<ProductImage> _selectedImages = [];
 
   // Selectors
   String? selectedCategory;
@@ -73,7 +74,8 @@ class FormProvider extends ChangeNotifier {
   TextEditingController get barcodeController => _barcodeController;
   List<String> get categories => _categories;
   List<String> get availabilityStatuses => _availabilityStatuses;
-  List<XFile> get selectedImages => _selectedImages;
+  List<ProductImage> get selectedImages => _selectedImages;
+
   Product get product {
     return Product(
       id: 0,
@@ -119,11 +121,20 @@ class FormProvider extends ChangeNotifier {
         .toList();
   }
 
+  // Métodos para imágenes
   Future<void> pickImagesFromGallery() async {
     try {
       final List<XFile> images = await _picker.pickMultiImage();
       if (images.isNotEmpty) {
-        _selectedImages.addAll(images);
+        final productImages = images
+            .map(
+              (img) => ProductImage.local(
+                img.path,
+                id: DateTime.now().millisecondsSinceEpoch.toString(),
+              ),
+            )
+            .toList();
+        _selectedImages.addAll(productImages);
         notifyListeners();
       }
     } catch (e) {
@@ -135,12 +146,38 @@ class FormProvider extends ChangeNotifier {
     try {
       final XFile? image = await _picker.pickImage(source: ImageSource.camera);
       if (image != null) {
-        _selectedImages.add(image);
+        _selectedImages.add(
+          ProductImage.local(
+            image.path,
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
+          ),
+        );
         notifyListeners();
       }
     } catch (e) {
       debugPrint('Error taking photo: $e');
     }
+  }
+
+  void addNetworkImage(String url, {String? id}) {
+    _selectedImages.add(
+      ProductImage.network(
+        url,
+        id: id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      ),
+    );
+    notifyListeners();
+  }
+
+  void addNetworkImages(List<String> urls) {
+    final productImages = urls.map((url) {
+      return ProductImage.network(
+        url,
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+      );
+    }).toList();
+    _selectedImages.addAll(productImages);
+    notifyListeners();
   }
 
   void removeImage(int index) {
@@ -152,6 +189,15 @@ class FormProvider extends ChangeNotifier {
 
   void clearImages() {
     _selectedImages.clear();
+    notifyListeners();
+  }
+
+  void reorderImages(int oldIndex, int newIndex) {
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+    final ProductImage item = _selectedImages.removeAt(oldIndex);
+    _selectedImages.insert(newIndex, item);
     notifyListeners();
   }
 
@@ -183,6 +229,7 @@ class FormProvider extends ChangeNotifier {
     _returnPolicyController.clear();
     _tagsController.clear();
     _barcodeController.clear();
+    _selectedImages.clear();
     selectedCategory = null;
     selectedAvailability = null;
     notifyListeners();
@@ -208,9 +255,21 @@ class FormProvider extends ChangeNotifier {
     _barcodeController.text = product.meta.barcode;
     selectedCategory = product.category;
     selectedAvailability = product.availabilityStatus;
+
+    // Cargar imágenes como network (asumiendo que vienen de la API)
+    _selectedImages = product.images
+        .map(
+          (url) => ProductImage.network(
+            url,
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
+          ),
+        )
+        .toList();
+
     notifyListeners();
   }
 
+  // Validadores
   String? basicStringValidator(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'This field is required';
@@ -244,7 +303,7 @@ class FormProvider extends ChangeNotifier {
 
   String? percentageValidator(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return null; // Campo opcional
+      return null;
     }
     final number = double.tryParse(value);
     if (number == null) {

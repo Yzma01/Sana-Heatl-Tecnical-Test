@@ -42,7 +42,7 @@ class Dummyjson {
   }
 
   Future<Map<String, dynamic>> fetchProducts() async {
-    final response = await http.get(Uri.parse('$baseUrl'));
+    final response = await http.get(Uri.parse(baseUrl));
 
     if (response.statusCode == 200) {
       return parseResponse(response.body);
@@ -62,6 +62,7 @@ class Dummyjson {
   }
 
   Future<void> deleteProduct(int id) async {
+    debugPrint('aaaaaa; jjjj $id');
     final response = await http.delete(Uri.parse('$baseUrl/$id'));
 
     if (response.statusCode == 200) {
@@ -83,5 +84,40 @@ class Dummyjson {
     }
 
     throw Exception(getErrorMessage(response.statusCode));
+  }
+
+  Future<void> updateProduct(int id, Product product) async {
+    final Map<String, dynamic> dataToSend = product.toJson();
+    dataToSend.remove('id');
+
+    final response = await http.put(
+      Uri.parse('$baseUrl/$id'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(dataToSend),
+    );
+
+    if (response.statusCode == 200) return;
+
+    throw Exception(getErrorMessage(response.statusCode));
+  }
+
+  Future<List<dynamic>> getCategories() async {
+    final response = await http.get(Uri.parse('$baseUrl/categories'));
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) as List<dynamic>;
+    } else {
+      throw Exception(getErrorMessage(response.statusCode));
+    }
+  }
+
+  Future<Map<String, dynamic>> getCategory(String url) async {
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      return parseResponse(response.body);
+    } else {
+      throw Exception(getErrorMessage(response.statusCode));
+    }
   }
 }
