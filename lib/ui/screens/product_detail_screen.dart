@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sana_health_t/blocs/product/bloc/product_bloc.dart';
+import 'package:sana_health_t/blocs/product/bloc/product_event.dart';
 import 'package:sana_health_t/data/models/product.dart';
+import 'package:sana_health_t/ui/screens/edit_product_screen.dart';
+import 'package:sana_health_t/ui/screens/home_screen.dart';
+import 'package:sana_health_t/ui/widgets/general/icon_button.dart';
+import 'package:sana_health_t/ui/widgets/general/section_title.dart';
 import 'package:sana_health_t/ui/widgets/product_detail/images_carousel.dart';
 import 'package:sana_health_t/ui/widgets/product_detail/review_card.dart';
 
@@ -13,10 +20,61 @@ class ProductDetailScreen extends StatefulWidget {
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
+  void _addReview() {}
+
+  void _editProduct() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditProductScreen(product: widget.product),
+      ),
+    );
+  }
+
+  void _deleteProduct() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Product'),
+        content: const Text('Are you sure you want to delete this product?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () {
+              context.read<ProductBloc>().add(DeleteProduct(widget.product.id));
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.product.title)),
+      appBar: AppBar(
+        actions: [
+          ButtonWithIcon(
+            message: 'Edit this product',
+            onPressed: _editProduct,
+            icon: Icon(Icons.edit, color: Colors.amber),
+          ),
+          ButtonWithIcon(
+            message: 'Delete this item',
+            onPressed: _deleteProduct,
+            icon: Icon(Icons.delete_forever, color: Colors.red),
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -55,12 +113,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 8),
-              Text(
-                'Reviews',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                children: [
+                  SectionTitle(title: 'Reviews'),
+                  Spacer(),
+                  Tooltip(
+                    message: 'Add review',
+                    child: IconButton(
+                      onPressed: _addReview,
+                      icon: Icon(Icons.add, color: Colors.blue),
+                    ),
+                  ),
+                ],
               ),
 
               if (widget.product.reviews.isNotEmpty)

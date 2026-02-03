@@ -1,13 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:sana_health_t/blocs/product/bloc/product_bloc.dart';
 import 'package:sana_health_t/blocs/product/bloc/product_event.dart';
 import 'package:sana_health_t/blocs/product/repository/product_repository.dart';
 import 'package:sana_health_t/data/api/dummyjson.dart';
+import 'package:sana_health_t/providers/form.dart';
 import 'package:sana_health_t/ui/screens/home_screen.dart';
+import 'package:sana_health_t/ui/widgets/general/search_bar.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<FormProvider>(create: (_) => FormProvider()),
+        MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (context) => ProductBloc(
+                productRepository: ProductRepository(api: Dummyjson()),
+              )..add(LoadProducts()),
+            ),
+          ],
+          child: MyApp(),
+        ),
+      ],
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -20,15 +39,15 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: MultiBlocProvider(
-        providers: [
-          BlocProvider(
-            create: (context) => ProductBloc(
-              productRepository: ProductRepository(api: Dummyjson()),
-            )..add(LoadProducts()),
+      home: Scaffold(
+        body: SafeArea(
+          child: Column(
+            children: [
+              SearchBarWidget(),
+              Expanded(child: HomeScreen()),
+            ],
           ),
-        ],
-        child: const Home(),
+        ),
       ),
     );
   }

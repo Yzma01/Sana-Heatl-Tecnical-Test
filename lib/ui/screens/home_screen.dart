@@ -5,14 +5,14 @@ import 'package:sana_health_t/blocs/product/bloc/product_state.dart';
 import 'package:sana_health_t/ui/widgets/general/loading.dart';
 import 'package:sana_health_t/ui/widgets/home/product_card.dart';
 
-class Home extends StatefulWidget {
-  const Home({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<Home> createState() => _HomeState();
+  State<HomeScreen> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -1,3 +1,5 @@
+import 'package:sana_health_t/data/models/product.dart';
+
 abstract class ProductEvent {}
 
 class LoadProducts extends ProductEvent {}
@@ -24,7 +26,7 @@ class SortProducts extends ProductEvent {
 }
 
 class AddProduct extends ProductEvent {
-  final Map<String, dynamic> productData;
+  final Product productData;
 
   AddProduct(this.productData);
 }
