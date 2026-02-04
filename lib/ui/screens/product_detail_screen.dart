@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sana_health_t/blocs/product/bloc/product_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:sana_health_t/blocs/product/bloc/product_bloc.dart';
 import 'package:sana_health_t/blocs/product/bloc/product_event.dart';
 import 'package:sana_health_t/data/models/product.dart';
 import 'package:sana_health_t/providers/form.dart';
 import 'package:sana_health_t/ui/screens/add_product_screen.dart';
-import 'package:sana_health_t/ui/widgets/general/icon_button.dart';
-import 'package:sana_health_t/ui/widgets/general/section_title.dart';
-import 'package:sana_health_t/ui/widgets/product_detail/images_carousel.dart';
-import 'package:sana_health_t/ui/widgets/product_detail/review_card.dart';
+import 'package:sana_health_t/ui/widgets/product_detail/sections/dimensions_section.dart';
+import 'package:sana_health_t/ui/widgets/product_detail/sections/meta_section.dart';
+import 'package:sana_health_t/ui/widgets/product_detail/sections/price_section.dart';
+import 'package:sana_health_t/ui/widgets/product_detail/sections/product_header_section.dart';
+import 'package:sana_health_t/ui/widgets/product_detail/sections/product_info_section.dart';
+import 'package:sana_health_t/ui/widgets/product_detail/sections/reviews_section.dart';
+import 'package:sana_health_t/ui/widgets/product_detail/sections/shipping_section.dart';
+import 'package:sana_health_t/ui/widgets/product_detail/sections/specs_section.dart';
+import 'package:sana_health_t/ui/widgets/product_detail/sections/tags_section.dart';
+import 'package:sana_health_t/ui/widgets/product_detail/floating_action_buttons.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -21,14 +27,15 @@ class ProductDetailScreen extends StatefulWidget {
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
-  void _addReview() {}
-
   void _editProduct() {
+    final formProvider = FormProvider();
+    formProvider.loadProduct(widget.product);
+
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ChangeNotifierProvider(
-          create: (_) => FormProvider(),
+        builder: (_) => ChangeNotifierProvider.value(
+          value: formProvider,
           child: AddProductScreen(product: widget.product),
         ),
       ),
@@ -39,17 +46,37 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Product'),
-        content: const Text('Are you sure you want to delete this product?'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.red.shade50,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                Icons.warning_amber_rounded,
+                color: Colors.red.shade700,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text('Delete Product'),
+          ],
+        ),
+        content: const Text(
+          'Are you sure you want to delete this product? This action cannot be undone.',
+        ),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
+            onPressed: () => Navigator.pop(context),
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
             onPressed: () {
               context.read<ProductBloc>().add(
                 DeleteProduct(widget.product.id!),
@@ -57,7 +84,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               Navigator.pop(context);
               Navigator.pop(context);
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: const Text('Delete'),
           ),
         ],
       ),
@@ -67,88 +94,52 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          ButtonWithIcon(
-            message: 'Edit this product',
-            onPressed: _editProduct,
-            icon: Icon(Icons.edit, color: Colors.amber),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 60,
+            floating: true,
+            pinned: true,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            foregroundColor: Colors.grey.shade800,
+            elevation: 0,
+            actions: [
+              // IconButton(
+              //   icon: const Icon(Icons.share_outlined),
+              //   onPressed: () {},
+              //   tooltip: 'Share',
+              // ),
+              // IconButton(
+              //   icon: const Icon(Icons.favorite_border),
+              //   onPressed: () {},
+              //   tooltip: 'Add to favorites',
+              // ),
+            ],
           ),
-          ButtonWithIcon(
-            message: 'Delete this item',
-            onPressed: _deleteProduct,
-            icon: Icon(Icons.delete_forever, color: Colors.red),
+          SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ProductHeaderSection(product: widget.product),
+                ProductInfoSection(product: widget.product),
+                PriceSection(product: widget.product),
+                TagsSection(product: widget.product),
+                SpecsSection(product: widget.product),
+                ShippingSection(product: widget.product),
+                DimensionsSection(product: widget.product),
+                MetaSection(product: widget.product),
+                ReviewsSection(product: widget.product),
+                const SizedBox(height: 80),
+              ],
+            ),
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              widget.product.images.isNotEmpty
-                  ? ImagesCarousel(images: widget.product.images)
-                  : Image.network(widget.product.thumbnail),
-              const SizedBox(height: 10),
-              Text(
-                widget.product.title,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                '\$${widget.product.price.toStringAsFixed(2)}',
-                style: const TextStyle(fontSize: 20, color: Colors.green),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Category: ${widget.product.category}',
-                style: const TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Rating: ${widget.product.rating}',
-                style: const TextStyle(fontSize: 16, color: Colors.orange),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                widget.product.description,
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  SectionTitle(title: 'Reviews'),
-                  Spacer(),
-                  Tooltip(
-                    message: 'Add review',
-                    child: IconButton(
-                      onPressed: _addReview,
-                      icon: Icon(Icons.add, color: Colors.blue),
-                    ),
-                  ),
-                ],
-              ),
-
-              if (widget.product.reviews.isNotEmpty)
-                ...widget.product.reviews.map(
-                  (review) => ReviewCard(review: review),
-                )
-              else
-                const Padding(
-                  padding: EdgeInsets.only(top: 20),
-                  child: Text(
-                    'No reviews available.',
-                    style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
-                  ),
-                ),
-            ],
-          ),
-        ),
+      floatingActionButton: ProductFloatingActionButtons(
+        onEdit: _editProduct,
+        onDelete: _deleteProduct,
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }

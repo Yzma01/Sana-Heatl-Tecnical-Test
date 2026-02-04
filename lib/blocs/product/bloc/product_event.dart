@@ -44,8 +44,6 @@ class DeleteProduct extends ProductEvent {
   DeleteProduct(this.productId);
 }
 
-class ProductsCategories extends ProductEvent {}
-
 class ProductCategory extends ProductEvent {
   final String url;
 

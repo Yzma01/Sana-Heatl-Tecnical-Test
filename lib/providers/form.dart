@@ -4,13 +4,18 @@ import 'package:sana_health_t/data/models/image.dart';
 import 'package:sana_health_t/data/models/product.dart';
 import 'package:sana_health_t/data/models/dimentions.dart';
 import 'package:sana_health_t/data/models/meta.dart';
+import 'package:sana_health_t/data/models/review.dart';
 
 class FormProvider extends ChangeNotifier {
+  Product? _editingProduct;
+
   // Basic controllers
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _brandController = TextEditingController();
   final TextEditingController _skuController = TextEditingController();
+  List<Review>? _reviews;
+  double? _rating;
 
   // Pricing controllers
   final TextEditingController _priceController = TextEditingController();
@@ -41,12 +46,7 @@ class FormProvider extends ChangeNotifier {
   String? selectedCategory;
   String? selectedAvailability;
 
-  final List<String> _categories = [
-    'Beauty',
-    'Fragrances',
-    'Furniture',
-    'Groceries',
-  ];
+  final List<String> _categories = [];
 
   final List<String> _availabilityStatuses = [
     'In Stock',
@@ -77,14 +77,15 @@ class FormProvider extends ChangeNotifier {
   List<ProductImage> get selectedImages => _selectedImages;
 
   Product get product {
+    final now = DateTime.now();
     return Product(
-      id: 0,
+      id: _editingProduct != null ? _editingProduct!.id : 0,
       title: _titleController.text.trim(),
       description: _descriptionController.text.trim(),
       category: selectedCategory ?? '',
       price: double.tryParse(_priceController.text) ?? 0.0,
       discountPercentage: double.tryParse(_discountController.text) ?? 0.0,
-      rating: 0.0,
+      rating: _editingProduct != null ? _editingProduct!.rating : 0.0,
       stock: int.tryParse(_stockController.text) ?? 0,
       tags: _parseTags(_tagsController.text),
       brand: _brandController.text.trim(),
@@ -98,12 +99,12 @@ class FormProvider extends ChangeNotifier {
       warrantyInformation: _warrantyController.text.trim(),
       shippingInformation: _shippingController.text.trim(),
       availabilityStatus: selectedAvailability ?? 'In Stock',
-      reviews: [],
+      reviews: _editingProduct != null ? _editingProduct!.reviews : [],
       returnPolicy: _returnPolicyController.text.trim(),
       minimumOrderQuantity: int.tryParse(_minimumOrderController.text) ?? 1,
       meta: Meta(
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
+        createdAt: _editingProduct?.meta.createdAt ?? now,
+        updatedAt: now,
         barcode: _barcodeController.text.trim(),
         qrCode: '',
       ),
@@ -211,7 +212,13 @@ class FormProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setCategory(String? category) {
+    selectedCategory = category;
+    notifyListeners();
+  }
+
   void clearForm() {
+    _editingProduct = null;
     _titleController.clear();
     _descriptionController.clear();
     _brandController.clear();
@@ -232,10 +239,12 @@ class FormProvider extends ChangeNotifier {
     _selectedImages.clear();
     selectedCategory = null;
     selectedAvailability = null;
+    _reviews = [];
     notifyListeners();
   }
 
   void loadProduct(Product product) {
+    _editingProduct = product;
     _titleController.text = product.title;
     _descriptionController.text = product.description;
     _brandController.text = product.brand;
@@ -253,10 +262,17 @@ class FormProvider extends ChangeNotifier {
     _returnPolicyController.text = product.returnPolicy;
     _tagsController.text = product.tags.join(', ');
     _barcodeController.text = product.meta.barcode;
-    selectedCategory = product.category;
-    selectedAvailability = product.availabilityStatus;
 
-    // Cargar imágenes como network (asumiendo que vienen de la API)
+    if (product.reviews.isNotEmpty) {
+      _reviews = product.reviews;
+    }
+
+    if (categories.contains(product.category)) {
+      selectedCategory = product.category;
+    } else {
+      selectedCategory = null;
+    }
+
     _selectedImages = product.images
         .map(
           (url) => ProductImage.network(

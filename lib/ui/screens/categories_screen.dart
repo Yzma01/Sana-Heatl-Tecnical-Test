@@ -4,6 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sana_health_t/blocs/product/bloc/product_bloc.dart';
 import 'package:sana_health_t/blocs/product/bloc/product_event.dart';
 import 'package:sana_health_t/blocs/product/bloc/product_state.dart';
+import 'package:sana_health_t/blocs/product/categories/categories_bloc.dart';
+import 'package:sana_health_t/blocs/product/categories/categories_event.dart';
+import 'package:sana_health_t/blocs/product/categories/categories_state.dart';
 import 'package:sana_health_t/data/models/categories.dart';
 import 'package:sana_health_t/ui/widgets/category/category_card.dart';
 import 'package:sana_health_t/ui/widgets/general/loading.dart';
@@ -17,18 +20,18 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<ProductBloc>().add(ProductsCategories());
+    context.read<CategoriesBloc>().add(LoadCategories());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: BlocBuilder<ProductBloc, ProductState>(
+      body: BlocBuilder<CategoriesBloc, CategoriesState>(
         builder: (context, state) {
-          if (state is ProductLoading) return Loading();
+          if (state is CategoriesLoading) return Loading();
 
-          if (state is ProductError) {
+          if (state is CategoresError) {
             return ListView(
               physics: const AlwaysScrollableScrollPhysics(),
               children: [
@@ -40,7 +43,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             );
           }
 
-          if (state is ProductCategoryLoaded) {
+          if (state is CategoriesLoaded) {
             return ListView(
               children: state.categories
                   .map((category) => CategoryCard(category: category))

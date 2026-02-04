@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:sana_health_t/blocs/product/bloc/product_bloc.dart';
 import 'package:sana_health_t/blocs/product/bloc/product_event.dart';
-import 'package:sana_health_t/blocs/product/repository/product_repository.dart';
+import 'package:sana_health_t/blocs/product/categories/categories_bloc.dart';
+import 'package:sana_health_t/repositories/product/product_repository.dart';
 import 'package:sana_health_t/data/api/dummyjson.dart';
 import 'package:sana_health_t/providers/searchbar.dart';
 import 'package:sana_health_t/ui/screens/home_screen.dart';
@@ -20,6 +21,11 @@ void main() {
               create: (context) => ProductBloc(
                 productRepository: ProductRepository(api: Dummyjson()),
               )..add(LoadProducts()),
+            ),
+            BlocProvider(
+              create: (context) => CategoriesBloc(
+                productRepository: ProductRepository(api: Dummyjson()),
+              ),
             ),
           ],
           child: MyApp(),

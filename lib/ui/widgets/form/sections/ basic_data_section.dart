@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sana_health_t/blocs/product/bloc/product_bloc.dart';
+import 'package:sana_health_t/blocs/product/bloc/product_state.dart';
+import 'package:sana_health_t/blocs/product/categories/categories_bloc.dart';
+import 'package:sana_health_t/blocs/product/categories/categories_state.dart';
 import 'package:sana_health_t/providers/form.dart';
 import 'package:sana_health_t/ui/widgets/form/selector_input.dart';
 import 'package:sana_health_t/ui/widgets/form/text_input.dart';
@@ -32,18 +37,28 @@ class BasicDataSection extends StatelessWidget {
           validator: formProvider.basicStringValidator,
         ),
         const SizedBox(height: 12),
-        SelectorInput<String>(
-          label: 'Category',
-          hint: 'Select a category',
-          prefixIcon: Icons.category,
-          value: formProvider.selectedCategory,
-          items: formProvider.categories
-              .map((c) => DropdownMenuItem(value: c, child: Text(c)))
-              .toList(),
-          onChanged: (value) {
-            formProvider.updateCategory(value);
+        BlocBuilder<CategoriesBloc, CategoriesState>(
+          builder: (context, state) {
+            List<DropdownMenuItem<String>> categoryItems = [];
+            if (state is CategoriesLoaded) {
+              debugPrint('aaaa; ${state.categories}');
+              categoryItems = state.categories
+                  .map(
+                    (c) => DropdownMenuItem(value: c.name, child: Text(c.name)),
+                  )
+                  .toList();
+            }
+
+            return SelectorInput<String>(
+              label: 'Category',
+              hint: 'Select a category',
+              prefixIcon: Icons.category,
+              value: formProvider.selectedCategory,
+              items: categoryItems,
+              onChanged: formProvider.updateCategory,
+              validator: formProvider.basicSelectorValidator,
+            );
           },
-          validator: formProvider.basicSelectorValidator,
         ),
         const SizedBox(height: 12),
         CustomTextInput(

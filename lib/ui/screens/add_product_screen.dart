@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sana_health_t/blocs/product/bloc/product_bloc.dart';
 import 'package:sana_health_t/blocs/product/bloc/product_event.dart';
+import 'package:sana_health_t/blocs/product/categories/categories_bloc.dart';
+import 'package:sana_health_t/blocs/product/categories/categories_event.dart';
 import 'package:sana_health_t/data/models/product.dart';
 import 'package:sana_health_t/providers/form.dart';
 import 'package:sana_health_t/ui/widgets/form/sections/%20%20dimensions_section.dart';
@@ -24,6 +26,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final _formKey = GlobalKey<FormState>();
   late FormProvider form;
   bool isEdit = false;
+  bool _initialized = false;
 
   @override
   void didChangeDependencies() {
@@ -34,11 +37,13 @@ class _AddProductScreenState extends State<AddProductScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.product != null && !widget.product!.isEmpty) {
+    context.read<CategoriesBloc>().add(LoadCategories());
+    if (!_initialized && widget.product != null && !widget.product!.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        form.loadProduct(widget.product!);
+        context.read<FormProvider>().loadProduct(widget.product!);
+        isEdit = true;
+        _initialized = true;
       });
-      isEdit = true;
     }
   }
 
@@ -52,11 +57,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
       }
 
       final productData = form.product;
+      debugPrint('aaaa; ${productData.toString()}');
       if (isEdit) {
+        debugPrint('aaaa;se $isEdit');
         context.read<ProductBloc>().add(
           UpdateProduct(widget.product!.id!, productData),
         );
       } else {
+        debugPrint('aaaa;na $isEdit');
         context.read<ProductBloc>().add(AddProduct(productData));
       }
       form.clearForm();

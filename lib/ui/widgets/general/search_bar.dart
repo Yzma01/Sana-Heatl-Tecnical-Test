@@ -100,11 +100,6 @@ class _SearchBarState extends State<SearchBarWidget> {
                 onPressed: _addProduct,
                 icon: Icon(Icons.add, color: Colors.blue),
               ),
-              ButtonWithIcon(
-                message: 'Delete search values',
-                onPressed: _deleteSearch,
-                icon: Icon(Icons.delete, color: Colors.red),
-              ),
             ],
           ),
         ),

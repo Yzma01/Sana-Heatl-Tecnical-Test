@@ -2,7 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/rendering.dart';
 import 'package:sana_health_t/blocs/product/bloc/product_event.dart';
 import 'package:sana_health_t/blocs/product/bloc/product_state.dart';
-import 'package:sana_health_t/blocs/product/repository/product_repository.dart';
+import 'package:sana_health_t/repositories/product/product_repository.dart';
 import 'package:sana_health_t/data/models/categories.dart';
 import 'package:sana_health_t/data/models/product.dart';
 
@@ -18,7 +18,6 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     on<AddProduct>(_onAddProduct);
     on<UpdateProduct>(_onUpdateProduct);
     on<ProductCategory>(_onProductCategory);
-    on<ProductsCategories>(_onProductsCategories);
   }
 
   void _onDeleteProduct(DeleteProduct event, Emitter<ProductState> emit) async {
@@ -66,40 +65,16 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   }
 
   void _onAddProduct(AddProduct event, Emitter<ProductState> emit) async {
-    final currentState = state;
-
-    if (currentState is! ProductLoaded) {
-      emit(ProductError('Cannot add product right now'));
-      return;
-    }
-    emit(ProductLoading());
-    try {
-      await productRepository.addProduct(event.productData);
-      event.productData.id = currentState.products.length + 10;
-      localProducts.add(event.productData);
-      emit(ProductLoaded(filterProducts(currentState.products)));
-    } catch (e) {
-      emit(ProductError(e.toString()));
-    }
-  }
-
-  void _onUpdateProduct(UpdateProduct event, Emitter<ProductState> emit) async {
     if (state is! ProductLoaded) return;
-
     final currentState = state as ProductLoaded;
-
     try {
       emit(ProductLoading());
-      await productRepository.updateProduct(event.productId, event.updatedData);
+      final newProduct = event.productData.copyWith(
+        id: _nextId(currentState.products),
+      );
 
-      final updatedProducts = currentState.products.map((product) {
-        if (product.id == event.productId) {
-          final data = event.updatedData;
-          data.id = event.productId;
-          return data;
-        }
-        return product;
-      }).toList();
+      await productRepository.addProduct(newProduct);
+      final updatedProducts = [...currentState.products, newProduct];
 
       emit(ProductLoaded(filterProducts(updatedProducts)));
     } catch (e) {
@@ -107,14 +82,21 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     }
   }
 
-  void _onProductsCategories(
-    ProductsCategories event,
-    Emitter<ProductState> emit,
-  ) async {
-    emit(ProductLoading());
+  void _onUpdateProduct(UpdateProduct event, Emitter<ProductState> emit) async {
+    if (state is! ProductLoaded) return;
+    final currentState = state as ProductLoaded;
     try {
-      final categories = await productRepository.getCategories();
-      emit(ProductCategoryLoaded(categories: categories));
+      emit(ProductLoading());
+      final updatedProducts = currentState.products.map((product) {
+        if (product.id == event.productId) {
+          return event.updatedData.copyWith(id: product.id);
+        }
+        return product;
+      }).toList();
+
+      await productRepository.updateProduct(event.productId, event.updatedData);
+
+      emit(ProductLoaded(filterProducts(updatedProducts)));
     } catch (e) {
       emit(ProductError(e.toString()));
     }
@@ -139,5 +121,10 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     if (deletedProducts.isEmpty) return merged;
 
     return merged.where((p) => !deletedProducts.contains(p.id)).toList();
+  }
+
+  int _nextId(List<Product> products) {
+    if (products.isEmpty) return 1;
+    return products.map((p) => p.id!).reduce((a, b) => a > b ? a : b) + 1;
   }
 }
