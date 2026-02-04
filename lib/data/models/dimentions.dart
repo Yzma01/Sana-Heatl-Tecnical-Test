@@ -20,4 +20,6 @@ class Dimensions {
   Map<String, dynamic> toJson() {
     return {'depth': depth, 'width': width, 'height': height};
   }
+
+  bool get isEmpty => width == 0 && height == 0 && depth == 0;
 }

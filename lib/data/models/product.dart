@@ -1,10 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'package:sana_health_t/data/models/dimentions.dart';
 import 'package:sana_health_t/data/models/meta.dart';
 import 'package:sana_health_t/data/models/review.dart';
 
 class Product {
-  int id;
+  int? id;
   String title;
   String description;
   String category;
@@ -53,6 +52,56 @@ class Product {
     required this.images,
     required this.thumbnail,
   });
+
+  Product copyWith({
+    int? id,
+    String? title,
+    String? description,
+    String? category,
+    double? price,
+    double? discountPercentage,
+    double? rating,
+    int? stock,
+    List<String>? tags,
+    String? brand,
+    String? sku,
+    double? weight,
+    Dimensions? dimensions,
+    String? warrantyInformation,
+    String? shippingInformation,
+    String? availabilityStatus,
+    List<Review>? reviews,
+    String? returnPolicy,
+    int? minimumOrderQuantity,
+    Meta? meta,
+    List<String>? images,
+    String? thumbnail,
+  }) {
+    return Product(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      category: category ?? this.category,
+      price: price ?? this.price,
+      discountPercentage: discountPercentage ?? this.discountPercentage,
+      rating: rating ?? this.rating,
+      stock: stock ?? this.stock,
+      tags: tags ?? this.tags,
+      brand: brand ?? this.brand,
+      sku: sku ?? this.sku,
+      weight: weight ?? this.weight,
+      dimensions: dimensions ?? this.dimensions,
+      warrantyInformation: warrantyInformation ?? this.warrantyInformation,
+      shippingInformation: shippingInformation ?? this.shippingInformation,
+      availabilityStatus: availabilityStatus ?? this.availabilityStatus,
+      reviews: reviews ?? this.reviews,
+      returnPolicy: returnPolicy ?? this.returnPolicy,
+      minimumOrderQuantity: minimumOrderQuantity ?? this.minimumOrderQuantity,
+      meta: meta ?? this.meta,
+      images: images ?? this.images,
+      thumbnail: thumbnail ?? this.thumbnail,
+    );
+  }
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
@@ -112,5 +161,59 @@ class Product {
       'images': images,
       'thumbnail': thumbnail,
     };
+  }
+
+  @override
+  String toString() {
+    return '''
+Product(
+  id: $id,
+  title: $title,
+  description: $description,
+  category: $category,
+  price: $price,
+  discountPercentage: $discountPercentage,
+  rating: $rating,
+  stock: $stock,
+  tags: $tags,
+  brand: $brand,
+  sku: $sku,
+  weight: $weight,
+  dimensions: $dimensions,
+  warrantyInformation: $warrantyInformation,
+  shippingInformation: $shippingInformation,
+  availabilityStatus: $availabilityStatus,
+  reviews: ${reviews.length},
+  returnPolicy: $returnPolicy,
+  minimumOrderQuantity: $minimumOrderQuantity,
+  meta: $meta,
+  images: $images,
+  thumbnail: $thumbnail,
+)
+''';
+  }
+
+  bool get isEmpty {
+    return title.isEmpty &&
+        description.isEmpty &&
+        category.isEmpty &&
+        price == 0 &&
+        discountPercentage == 0 &&
+        rating == 0 &&
+        stock == 0 &&
+        tags.isEmpty &&
+        brand.isEmpty &&
+        sku.isEmpty &&
+        weight == 0 &&
+        dimensions.isEmpty &&
+        warrantyInformation.isEmpty &&
+        shippingInformation.isEmpty &&
+        availabilityStatus.isEmpty &&
+        reviews.isEmpty &&
+        returnPolicy.isEmpty &&
+        minimumOrderQuantity == 0 &&
+        meta.isEmpty &&
+        images.isEmpty &&
+        thumbnail.isEmpty;
   }
 }

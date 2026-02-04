@@ -37,6 +37,7 @@ dependencies:
   http: ^1.6.0
   flutter_bloc:
   bloc: ^9.2.0
+  image_picker:
 
 dev_dependencies:
   flutter_test:

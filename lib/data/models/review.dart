@@ -1,5 +1,4 @@
 class Review {
-  int id;
   double rating;
   String comment;
   DateTime date;
@@ -7,7 +6,6 @@ class Review {
   String reviewerEmail;
 
   Review({
-    required this.id,
     required this.rating,
     required this.comment,
     required this.date,
@@ -15,9 +13,18 @@ class Review {
     required this.reviewerEmail,
   });
 
+  factory Review.empty() {
+    return Review(
+      rating: 0.0,
+      comment: '',
+      date: DateTime.now(),
+      reviewerName: '',
+      reviewerEmail: '',
+    );
+  }
+
   factory Review.fromJson(Map<String, dynamic> json) {
     return Review(
-      id: json['id'],
       rating: (json['rating'] as num).toDouble(),
       comment: json['comment'],
       date: DateTime.parse(json['date']),
@@ -28,7 +35,6 @@ class Review {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
       'rating': rating,
       'comment': comment,
       'date': date.toIso8601String(),

@@ -43,3 +43,28 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+# Flutter / Dart
+.dart_tool/
+.packages
+.pub/
+build/
+/build/app/outputs/flutter-apk/
+# Android
+android/.gradle/
+android/app/build/
+android/build/
+# Flutter/Dart build outputs
+/build/
+**/build/
+android/app/build/
+*.apk
+*.aab
+*.so
+*.gradle
+
+
+# iOS
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
