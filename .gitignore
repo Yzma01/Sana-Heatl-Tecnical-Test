@@ -53,6 +53,15 @@ build/
 android/.gradle/
 android/app/build/
 android/build/
+# Flutter/Dart build outputs
+/build/
+**/build/
+android/app/build/
+*.apk
+*.aab
+*.so
+*.gradle
+
 
 # iOS
 ios/Pods/
