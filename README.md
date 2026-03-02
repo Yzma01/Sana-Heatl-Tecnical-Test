@@ -1,32 +1,32 @@
 # sana_health_t
 
-This is the technical test provided by Sana Health Technologies.
+Esta es la prueba técnica proporcionada por Sana Health Technologies.
 
-The technical test consists of implementing a marketplace of products using the public API DummyJSON.
+La prueba técnica consiste en implementar un marketplace de productos utilizando la API pública DummyJSON.
 
-## How to Use It
-1. First, [download the APK](https://drive.google.com/file/d/1k-s13QIAaMHXZHiPu6fzq_cj-yuLK2SS/view?usp=sharing).  
-2. Then, install it.  
-3. Deny Google Play advertisements.  
-4. Open the app.  
+## Cómo usarlo
+1. Primero, [descarga el APK](https://drive.google.com).  
+2. Luego, instálalo.  
+3. Rechaza las advertencias de Google Play.  
+4. Abre la aplicación.  
 
-## Functional Requirements
-* Products listed  
-* Search by text  
-* Category filter  
-* Detailed product view  
-* State management  
-* Fully working CRUD  
+## Requerimientos Funcionales
+* Listado de productos  
+* Búsqueda por texto  
+* Filtro por categorías  
+* Vista detallada del producto  
+* Gestión de estado  
+* CRUD totalmente funcional  
 
-> ⚠️ Note: The products that are added by the user are stored only temporarily in the BLoC. Since DummyJSON does not allow adding, deleting, or editing products, all these functionalities are volatile. If the app is closed, everything goes back to the initial state.  
+> ⚠️ Nota: Los productos que son agregados por el usuario se almacenan solo temporalmente en el BLoC. Dado que DummyJSON no permite agregar, eliminar o editar productos, todas estas funcionalidades son volátiles. Si la aplicación se cierra, todo vuelve al estado inicial.  
 
-## Technical Requirements
-* Stable Flutter version  
-* State management  
-* Good project structure  
-* Best practices  
+## Requerimientos Técnicos
+* Versión estable de Flutter  
+* Gestión de estado  
+* Buena estructura de proyecto  
+* Mejores prácticas  
 
-## Endpoints Used
+## Endpoints Utilizados
 * `/products`  
 * `/search?q=$query`  
 * `/$id`  
@@ -34,46 +34,45 @@ The technical test consists of implementing a marketplace of products using the 
 * `/categories`  
 * `/category/$category`  
 
-## Technical Decisions
-For this project, I prioritized functionality over UI, since the deadline was short. I decided to implement BLoC as a state manager because it is easy to read and understand. I only implemented 2 BLoCs: the product one and another to handle the categories.
+## Decisiones Técnicas
+Para este proyecto, prioricé la funcionalidad sobre la interfaz de usuario (UI), ya que el tiempo de entrega era corto. Decidí implementar BLoC como gestor de estado porque es fácil de leer y entender. Solo implementé 2 BLoCs: el de productos y otro para manejar las categorías.
 
-Also, I created 2 providers: one for the product form and another for the categories. Everything is organized in folders. The main screens are no longer than 200 lines.
+También creé 2 providers: uno para el formulario de productos y otro para las categorías. Todo está organizado en carpetas. Las pantallas principales no superan las 200 líneas.
 
-## Preview
-1. Fetching and listing products from the dummyjson API
+## Vista Previa
+1. Obtención y listado de productos desde la API dummyjson
 <p align="center">
   <img src="images/20260224-133411.jpg" alt="2026-02-24 13:34" width="300">
 </p>
  
-3. Searching products by a key word
+3. Búsqueda de productos por palabra clave
 <p align="center">
   <img src="images/20260224-133422.jpg" alt="2026-02-24 13:34" width="300">
 </p>
-5. These are all the categories that dummyjson API ofrece
+5. Estas son todas las categorías que ofrece la API dummyjson
 <p align="center">
   <img src="images/20260224-133432.jpg" alt="2026-02-24 13:34" width="300">
   <img src="images/20260224-133437.jpg" alt="2026-02-24 13:34" width="300">
 </p>
-6. Product detail screen
+6. Pantalla de detalle del producto
 <p align="center">
   <img src="images/20260224-133442.jpg" alt="2026-02-24 13:34" width="300">
   <img src="images/20260224-133450.jpg" alt="2026-02-24 13:34" width="300">
   <img src="images/20260224-133500.jpg" alt="2026-02-24 13:35" width="300">
 </p>
-7. Notification before deleting a product
+7. Notificación antes de eliminar un producto
 <p align="center">
   <img src="images/20260224-133506.jpg" alt="2026-02-24 13:35" width="300">
 </p>
-8. Edit a product information
+8. Editar la información de un producto
 <p align="center">
   <img src="images/20260224-133516.jpg" alt="2026-02-24 13:35" width="300">
   <img src="images/20260224-133520.jpg" alt="2026-02-24 13:35" width="300">
   <img src="images/20260224-133524.jpg" alt="2026-02-24 13:35" width="300">
 </p>
-9. Add a new product form
+9. Formulario para agregar un nuevo producto
 <p align="center">
   <img src="images/20260224-133537.jpg" alt="2026-02-24 13:35" width="300">
   <img src="images/20260224-133542.jpg" alt="2026-02-24 13:35" width="300">
   <img src="images/20260224-133545.jpg" alt="2026-02-24 13:35" width="300">
 </p>
-
